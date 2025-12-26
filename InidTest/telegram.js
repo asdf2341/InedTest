@@ -2,8 +2,8 @@ import TelegramBot from 'node-telegram-bot-api';
 import { exec } from 'child_process';
 // import path from 'path';
 
-const token = '7515928459:AAF5dp_E1rB9NK5be_PUXSX8CoCd_c037FI';
-const chatId = '1090132900';
+const token = process.env.TELEGRAM_TOKEN;
+const chatId = process.env.TELEGRAM_CHAT_ID;
 
 const bot = new TelegramBot(token, { polling: true });
 
