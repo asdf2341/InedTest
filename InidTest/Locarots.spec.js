@@ -148,8 +148,8 @@ for (const index of [0, 1]) {
     // --- Success ---
     const successDir = path.resolve('successPhotos');
 const errorDir = path.resolve('errorPhotos');
-if (!fs.existsSync(successDir)) fs.mkdirSync(successDir);
-if (!fs.existsSync(errorDir)) fs.mkdirSync(errorDir);
+if (!fs.existsSync(successDir)) fs.mkdirSync(successDir, { recursive: true });
+if (!fs.existsSync(errorDir)) fs.mkdirSync(errorDir, { recursive: true });
        const successScreenshot = path.join(successDir, `screenshot_success_${Date.now()}.png`);
     await page.screenshot({ path: successScreenshot, fullPage: true });
     await sendMessage(`✅ <b>Тест</b> успешно завершен!\n🏠 Адрес: ${selectedValue}, ${streetName} ${RandomHouse}, кв ${randomFlat}, 📞 Контакты, 📄 Основное, ➕ Дополнительно, 📷 Фото, 📝 Описание — все заполнено.`);
