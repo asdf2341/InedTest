@@ -182,7 +182,7 @@ for (const index of [0, 1]) {
   // } finally {
   //   await context.close();
   // }
-    catch (err) {
+  } catch (err) {
   console.error('❌ TEST FAILED');
   console.error(err);
 
