@@ -154,32 +154,38 @@ for (const index of [0, 1]) {
     await sendMessage(`✅ <b>Тест</b> успешно завершен!\n🏠 Адрес: ${selectedValue}, ${streetName} ${RandomHouse}, кв ${randomFlat}, 📞 Контакты, 📄 Основное, ➕ Дополнительно, 📷 Фото, 📝 Описание — все заполнено.`);
     await sendPhoto(successScreenshot);
 
-  } catch (err) {
-  const errorDir = path.resolve('errorPhotos');
+//   } catch (err) {
+//   const errorDir = path.resolve('errorPhotos');
 
-  try {
-    if (page && !page.isClosed()) {
-      if (!fs.existsSync(errorDir)) {
-        fs.mkdirSync(errorDir, { recursive: true });
-      }
+//   try {
+//     if (page && !page.isClosed()) {
+//       if (!fs.existsSync(errorDir)) {
+//         fs.mkdirSync(errorDir, { recursive: true });
+//       }
 
-      const errorScreenshot = path.join(
-        errorDir,
-        `screenshot_error_${Date.now()}.png`
-      );
+//       const errorScreenshot = path.join(
+//         errorDir,
+//         `screenshot_error_${Date.now()}.png`
+//       );
 
-      await page.screenshot({ path: errorScreenshot, fullPage: true });
-      await sendPhoto(errorScreenshot);
-    }
-  } catch (screenshotErr) {
-    console.log('⚠️ Скриншот не сделан:', screenshotErr.message);
-  }
+//       await page.screenshot({ path: errorScreenshot, fullPage: true });
+//       await sendPhoto(errorScreenshot);
+//     }
+//   } catch (screenshotErr) {
+//     console.log('⚠️ Скриншот не сделан:', screenshotErr.message);
+//   }
 
-  await sendMessage(`❌ <b>Тест упал</b>\nОшибка: ${err.message}`);
+//   await sendMessage(`❌ <b>Тест упал</b>\nОшибка: ${err.message}`);
+//   throw err;
+// }
+
+  // } finally {
+  //   await context.close();
+  // }
+    catch (err) {
+  console.error('❌ TEST FAILED');
+  console.error(err);
+
+  // ⛔ временно НИЧЕГО больше не делаем
   throw err;
-}
-
-  } finally {
-    await context.close();
-  }
 });
