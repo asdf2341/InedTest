@@ -155,12 +155,29 @@ for (const index of [0, 1]) {
     await sendPhoto(successScreenshot);
 
   } catch (err) {
-    const errorDir = path.resolve('errorPhotos');
-   const errorScreenshot = path.join(errorDir, `screenshot_error_${Date.now()}.png`);
-    await page.screenshot({ path: errorScreenshot, fullPage: true });
-    await sendMessage(`❌ <b>Тест </b> упал!\nОшибка: ${err.message}`);
-    await sendPhoto(errorScreenshot);
-    throw err;
+  const errorDir = path.resolve('errorPhotos');
+
+  try {
+    if (page && !page.isClosed()) {
+      if (!fs.existsSync(errorDir)) {
+        fs.mkdirSync(errorDir, { recursive: true });
+      }
+
+      const errorScreenshot = path.join(
+        errorDir,
+        `screenshot_error_${Date.now()}.png`
+      );
+
+      await page.screenshot({ path: errorScreenshot, fullPage: true });
+      await sendPhoto(errorScreenshot);
+    }
+  } catch (screenshotErr) {
+    console.log('⚠️ Скриншот не сделан:', screenshotErr.message);
+  }
+
+  await sendMessage(`❌ <b>Тест упал</b>\nОшибка: ${err.message}`);
+  throw err;
+}
 
   } finally {
     await context.close();
