@@ -1,28 +1,44 @@
 name: Run Playwright Tests
 
 on:
-  workflow_dispatch:   # <-- позволяет запускать вручную
-  repository_dispatch: # <-- позволяет запускать из Telegram
+  repository_dispatch:
+    types: [run-tests]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+
+      
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
 
       - name: Install deps
         run: npm ci
 
-      - name: Install Playwright
+      # Кэш для браузеров Playwright
+      - name: Cache Playwright browsers
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: Run tests
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: npx playwright test
-
