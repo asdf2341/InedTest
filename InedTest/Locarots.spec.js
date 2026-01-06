@@ -156,13 +156,10 @@ if (!fs.existsSync(errorDir)) fs.mkdirSync(errorDir, { recursive: true });
     await sendPhoto(successScreenshot);
 
   } catch (err) {
-   const errorScreenshot = path.join(errorDir, `screenshot_error_${Date.now()}.png`);
-    await page.screenshot({ path: errorScreenshot, fullPage: true });
-    await sendMessage(`❌ <b>Тест </b> упал!\nОшибка: ${err.message}`);
-    await sendPhoto(errorScreenshot);
-    throw err;
+  console.error('❌ TEST FAILED');
+  console.error(err);
 
-  } finally {
-    await context.close();
-  }
+  // ⛔ временно НИЧЕГО больше не делаем
+  throw err;
+}
 });
