@@ -31,7 +31,7 @@ test('Adaptive Object Creation', async ({ browser }) => {
     const inputHouse = await page.getByPlaceholder('Пример: 5/5');
     const RandomHouse = await selectRandomHouse(page, inputHouse);
     const randomFlat = Math.floor(Math.random() * 100 + 1);
-    await page.getByPlaceholder('Не заполнено').fill(String(randomFlat));
+    await page.getByPlaceholder('Не заполнено').fill(String(randomFlat)+'а');
 
     await page.getByRole('button', { name: 'Далее' }).click();
 
