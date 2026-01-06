@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "telegram.js",
+
+   "main": "telegram.js",
   "scripts": {
     "start":"node telegram.js"
   },
