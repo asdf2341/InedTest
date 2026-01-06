@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "index.js",
-  "scripts": {},
+   "main": "telegram.js",
+  "scripts": {
+    "start":"node telegram.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
