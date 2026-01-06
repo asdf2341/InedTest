@@ -1,7 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { fillInput, fillLogin, selectRandomHouse, fillObjectDetails, selectRandomOption, fillRandomFromArray, fillObjectAddInfo, selectRandomOptionFromOpenedList ,selectRandomGroupList } from './helpers.js';
 import fs from 'fs';
-import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { sendMessage, sendPhoto } from './telegramUtils.js';
@@ -103,7 +102,10 @@ console.log('Additional Parameters')
       .locator('xpath=ancestor::div[contains(@class,"conditions-step")]');
 
  const switches = conditionsBlock.locator('span.MuiSwitch-switchBase');
-const filePath = path.resolve('InedInfo/Dogovor.pdf');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const filePath = path.join(__dirname, '../InedInfo/Dogovor.pdf');
 const fileInput = page.locator('input[type="file"]').first();
 
 for (const index of [0, 1]) {
