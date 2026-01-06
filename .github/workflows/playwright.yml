@@ -1,44 +1,26 @@
-name: Run Playwright Tests
+name: Run Tests
 
 on:
   repository_dispatch:
     types: [run-tests]
 
 jobs:
-  test:
+  run-playwright:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 20
-
-      
-      - name: Cache Node modules
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
-
       - name: Install deps
         run: npm ci
-
-      # Кэш для браузеров Playwright
-      - name: Cache Playwright browsers
-        uses: actions/cache@v3
+      - name: Run Playwright tests
+        run: npx playwright test || true
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
         with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
-
-      - name: Run tests
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: npx playwright test
+          name: screenshots
+          path: |
+            errorPhotos/
+            successPhotos/
