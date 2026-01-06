@@ -21,7 +21,7 @@ test('Adaptive Object Creation', async ({ browser }) => {
     // --- Navigate to Object Creation ---
     await page.getByText('Объекты').click();
     await page.getByText('Новый объект').click();
-
+    console.log('Enter to a object')
     // --- Select Type ---
     const selectedValue = await selectRandomOption(page, page.getByRole('combobox').nth(1));
 
@@ -34,7 +34,7 @@ test('Adaptive Object Creation', async ({ browser }) => {
     await page.getByPlaceholder('Не заполнено').fill(String(randomFlat));
 
     await page.getByRole('button', { name: 'Далее' }).click();
-
+ console.log('fill the address')
     // --- Fill Personal Info ---
     await page.getByPlaceholder('ФИО').fill('Ахметов Серик Маратович');
     await page.getByPlaceholder('+7 (___) ___ __ __').fill('777 777 77 77');
@@ -46,7 +46,7 @@ test('Adaptive Object Creation', async ({ browser }) => {
    await options.nth(randomIndex).click()
 
     await page.getByRole('button', { name: 'Далее' }).click();
-
+console.log('fill the name')
     // --- Fill Object Details ---
     function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; } 
     const rooms = randomInt(1, 4); 
@@ -60,7 +60,7 @@ test('Adaptive Object Creation', async ({ browser }) => {
 
     await fillObjectDetails(page);
     await page.getByRole('button', { name: 'Далее' }).click();
-
+console.log('fill object details')
     // --- Additional Parameters ---
     const additionalParamsBlock = page.locator('p', { hasText: 'Дополнительные параметры' })
       .locator('xpath=following-sibling::div[contains(@class,"MuiBox-root")]');
@@ -95,7 +95,7 @@ await page.waitForTimeout(1000);
       await additionalParamsBlock.nth(i + 1).getByRole('button', { name: buttonsToClick[i] }).click();
     }
     await page.getByRole('button', { name: 'Далее' }).click();
-
+console.log('fill object addtional')
     // --- Conditions ---
     const conditionsBlock = page.locator('p', { hasText: 'Условия объекта' })
       .locator('xpath=ancestor::div[contains(@class,"conditions-step")]');
@@ -122,7 +122,7 @@ for (const index of [0, 1]) {
     await conditionsBlock.locator('span.MuiSwitch-switchBase').nth(2).click();
     await page.getByRole('button', { name: 'Далее' }).click();
     await page.waitForTimeout(2000);
-
+console.log('fill conditions')
     // --- Upload Photos ---
     const folderPath = path.resolve('InedInfo');
     let files = fs.readdirSync(folderPath).filter(file => file.endsWith('.jpg'));
@@ -135,7 +135,7 @@ for (const index of [0, 1]) {
     await objectInput.setInputFiles(files.slice(1, 10).map(f => path.join(folderPath, f)));
 
     await page.getByRole('button', { name: 'Далее' }).click();
-
+console.log('upload photos')
     // --- Description ---
     const descriptionBlock = page.locator('div.description-step');
     await descriptionBlock.waitFor({ state: 'visible', timeout: 60000 });
@@ -144,7 +144,7 @@ for (const index of [0, 1]) {
 
     await page.getByRole('button', { name: 'Сохранить' }).click();
     await page.waitForTimeout(2000);
-
+console.log('desription')
     // --- Success ---
     const successDir = path.resolve('successPhotos');
 
