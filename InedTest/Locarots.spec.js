@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 import { fillInput, fillLogin, selectRandomHouse, fillObjectDetails, selectRandomOption, fillRandomFromArray, fillObjectAddInfo, selectRandomOptionFromOpenedList ,selectRandomGroupList } from './helpers.js';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { sendMessage, sendPhoto } from './telegramUtils.js';
 
 test('Adaptive Object Creation', async ({ browser }) => {
