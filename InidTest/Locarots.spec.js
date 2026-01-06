@@ -28,11 +28,13 @@ test('Adaptive Object Creation', async ({ browser }) => {
     // --- Fill Address ---
     const streets = ['Орынбор', 'Кабанбай', 'Туран', 'Мангилик', 'Турар'];
     const streetName = await fillRandomFromArray(page, 'Пример: Кабанбай батыра', streets);
+     console.log('fill the street')
     const inputHouse = await page.getByPlaceholder('Пример: 5/5');
     const RandomHouse = await selectRandomHouse(page, inputHouse);
+     console.log('fill the inputhouse')
     const randomFlat = Math.floor(Math.random() * 100 + 1);
     await page.getByPlaceholder('Не заполнено').fill(String(randomFlat));
-
+ console.log('randomFlat')
     await page.getByRole('button', { name: 'Далее' }).click();
  console.log('fill the address')
     // --- Fill Personal Info ---
