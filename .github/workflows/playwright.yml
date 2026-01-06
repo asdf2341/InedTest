@@ -24,3 +24,4 @@ jobs:
           path: |
             errorPhotos/
             successPhotos/
+
