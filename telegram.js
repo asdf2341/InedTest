@@ -2,6 +2,7 @@ import TelegramBot from 'node-telegram-bot-api';
 import { exec } from 'child_process';
 import { sendMessage, sendPhoto } from './telegramUtils.js'; // если telegram.js в корне
 import 'dotenv/config';
+import express from 'express';
 
 const token = process.env.TELEGRAM_TOKEN;
 const chatId = process.env.TELEGRAM_CHAT_ID;
