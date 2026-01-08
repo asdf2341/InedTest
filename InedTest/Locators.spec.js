@@ -1,9 +1,14 @@
+
 import { test, expect } from '@playwright/test';
 import { fillInput, fillLogin, selectRandomHouse, fillObjectDetails, selectRandomOption, fillRandomFromArray, fillObjectAddInfo, selectRandomOptionFromOpenedList ,selectRandomGroupList } from './helpers.js';
 import fs from 'fs';
 import path from 'path';
-import { sendMessage, sendPhoto } from './telegramUtils.js';
+import { sendMessage, sendPhoto } from '../telegramUtils.js';
 
+  const successDir = path.resolve('successPhotos');
+const errorDir = path.resolve('errorPhotos');
+if (!fs.existsSync(successDir)) fs.mkdirSync(successDir, { recursive: true });
+if (!fs.existsSync(errorDir)) fs.mkdirSync(errorDir, { recursive: true });
 test('Adaptive Object Creation', async ({ browser }) => {
   const context = await browser.newContext({
     viewport: { width: 1920, height: 1080 },
@@ -146,20 +151,21 @@ console.log('Upload Photos')
     await page.waitForTimeout(2000);
 console.log(' Description')
     // --- Success ---
-    const successDir = path.resolve('successPhotos');
-const errorDir = path.resolve('errorPhotos');
-if (!fs.existsSync(successDir)) fs.mkdirSync(successDir, { recursive: true });
-if (!fs.existsSync(errorDir)) fs.mkdirSync(errorDir, { recursive: true });
+
        const successScreenshot = path.join(successDir, `screenshot_success_${Date.now()}.png`);
     await page.screenshot({ path: successScreenshot, fullPage: true });
     await sendMessage(`✅ <b>Тест</b> успешно завершен!\n🏠 Адрес: ${selectedValue}, ${streetName} ${RandomHouse}, кв ${randomFlat}, 📞 Контакты, 📄 Основное, ➕ Дополнительно, 📷 Фото, 📝 Описание — все заполнено.`);
     await sendPhoto(successScreenshot);
 
-  } catch (err) {
-  console.error('❌ TEST FAILED');
-  console.error(err);
 
-  // ⛔ временно НИЧЕГО больше не делаем
-  throw err;
-}
+  } catch (err) {
+   const errorScreenshot = path.join(errorDir, `screenshot_error_${Date.now()}.png`);
+    await page.screenshot({ path: errorScreenshot, fullPage: true });
+    await sendMessage(`❌ <b>Тест </b> упал!\nОшибка: ${err.message}`);
+    await sendPhoto(errorScreenshot);
+    throw err;
+
+  } finally {
+    await context.close();
+  }
 });
