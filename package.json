@@ -6,7 +6,8 @@
 
    "main": "telegram.js",
   "scripts": {
-    "start":"node telegram.js"
+    "start":"node telegram.js",
+    "postinstall": "PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium"
 
   },
   "keywords": [],
