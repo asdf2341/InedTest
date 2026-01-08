@@ -1,12 +1,11 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { exec } from 'child_process';
-import { sendMessage, sendPhoto } from './telegramUtils.js'; // если telegram.js в корне
+import { sendMessage, sendPhoto } from './telegramUtils.js';
 import 'dotenv/config';
 import express from 'express';
-import path from 'path';
 
 const token = process.env.TELEGRAM_TOKEN;
-const webhookUrl = process.env.WEBHOOK_URL;
+const webhookUrl = process.env.WEBHOOK_URL; 
 
 const bot = new TelegramBot(token, { polling: false });
 
@@ -18,27 +17,48 @@ app.post(`/bot${token}`, (req, res) => {
   res.sendStatus(200);
 });
 
-const playwrightBin = path.resolve('node_modules', '.bin', 'playwright');
-bot.onText(/\/run_test/, async () => {
+bot.onText(/\/run_test/, async (msg) => { 
   await sendMessage('🚀 Запускаю автотест...');
 
-  exec(`${playwrightBin} test InedTest/Locators.spec.js --timeout=120000`,  { maxBuffer: 1024 * 1024 * 5 }, (error, stdout, stderr) => {
-    console.log('===== STDOUT =====');
-    console.log(stdout);
-    console.log('===== STDERR =====');
-    console.log(stderr);
+  exec('npx playwright test InedTest/Locators.spec.js --timeout=120000', {
+    env: process.env,
+    cwd: process.cwd(),
+    maxBuffer: 1024 * 1024 * 10
+  }, async (error, stdout, stderr) => {
+    
+    console.log('===== ПОЛНЫЙ ВЫВОД =====');
+    console.log('STDOUT:', stdout);
+    console.log('STDERR:', stderr);
+    console.log('ERROR:', error);
+    
+      console.log('STDOUT:', stdout);
+    console.log('STDERR:', stderr);
+    
+    // ✅ В Telegram отправляем только красиво
     if (error) {
-      console.error('❌ Playwright test failed:', error);
-      sendMessage(`❌ Ошибка при запуске теста:\n${error.message}`);
+      await sendMessage(`❌ <b>Тест провалился</b>\n\n${error.message}`);
       return;
     }
-    if (stderr) {
-      console.warn('⚠️ Playwright warnings/errors:', stderr);
-      sendMessage(`⚠️ Поток ошибок:\n${stderr}`);
-      return;
-    }
-    sendMessage(`✅ Автотест завершился. Вывод:\n${stdout}`);
+    
+    await sendMessage('✅ Тест прошел успешно!');
   });
-}); 
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+
+app.listen(PORT, async () => {
+  console.log(`Server listening on port ${PORT}`);
+  
+  // ✅ ВОТ ЧТО НУЖНО ДОБАВИТЬ!
+  if (webhookUrl) {
+    try {
+      await bot.deleteWebHook(); // удаляем старый
+      await bot.setWebHook(`${webhookUrl}/bot${token}`); // ставим новый
+      console.log(`✅ Webhook установлен: ${webhookUrl}/bot${token}`);
+    } catch (err) {
+      console.error('❌ Ошибка webhook:', err.message);
+    }
+  } else {
+    console.warn('⚠️ WEBHOOK_URL не задан в .env!');
+  }
+});
