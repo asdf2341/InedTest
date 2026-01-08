@@ -1,6 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 import { exec } from 'child_process';
 import { sendMessage, sendPhoto } from './telegramUtils.js'; // если telegram.js в корне
+import 'dotenv/config';
 import express from 'express';
 import path from 'path';
 
@@ -16,11 +17,12 @@ app.post(`/bot${token}`, (req, res) => {
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
+
 const playwrightBin = path.resolve('node_modules', '.bin', 'playwright');
 bot.onText(/\/run_test/, async () => {
   await sendMessage('🚀 Запускаю автотест...');
 
-  exec('${playwrightBin} test InedTest/Locators.spec.js --timeout=120000',  { maxBuffer: 1024 * 1024 * 5 }, (error, stdout, stderr) => {
+  exec(`${playwrightBin} test InedTest/Locators.spec.js --timeout=120000`,  { maxBuffer: 1024 * 1024 * 5 }, (error, stdout, stderr) => {
     console.log('===== STDOUT =====');
     console.log(stdout);
     console.log('===== STDERR =====');
