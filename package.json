@@ -6,7 +6,7 @@
 
    "main": "telegram.js",
   "scripts": {
-    "start":"node telegram.js",
+    "start":"node telegram.js"
  
   },
   "keywords": [],
