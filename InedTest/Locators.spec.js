@@ -166,6 +166,12 @@ console.log(' Description')
     throw err;
 
   } finally {
-    await context.close();
+  try {
+    await page.close(); // сначала закрываем страницу
+    await page.waitForTimeout(1000); // даем время сохранить видео
+    await context.close(); // потом контекст
+  } catch (closeErr) {
+    console.log('Context close error (ignored):', closeErr.message);
   }
+}
 });
