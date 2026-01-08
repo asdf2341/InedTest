@@ -8,6 +8,7 @@
   "scripts": {
     "start":"node telegram.js",
       "postinstall": "npx playwright install chromium"
+   
   },
   "keywords": [],
   "author": "",
