@@ -42,8 +42,8 @@ export async function selectRandomHouse(page, inputLocator) {
     const expanded = await inputLocator.getAttribute('aria-expanded');
     if (expanded === 'true') {
       const optionLocator = page.getByRole('option').first();
-      const selectedText = await optionLocator.textContent(); // get text
-      await optionLocator.click(); // click it
+      const selectedText = await optionLocator.textContent(); 
+      await optionLocator.click(); 
       return selectedText;
     }
   }
@@ -52,7 +52,6 @@ export async function selectRandomOptionFromOpenedList(page) {
   const options = page.getByRole('option');
   const count = await options.count();
 
-  // skip index 0 = "Не выбрано"
   const randomIndex = Math.floor(Math.random() * (count - 1)) + 1;
 
   const option = options.nth(randomIndex);
@@ -60,20 +59,17 @@ export async function selectRandomOptionFromOpenedList(page) {
   await option.click();
 }
 export async function selectRandomGroupList(groupLocator) {
-  // Находим все группы
   const groups = groupLocator.locator('[role="group"]');
   const groupsCount = await groups.count();
 
   for (let i = 0; i < groupsCount; i++) {
     const group = groups.nth(i);
 
-    // Получаем все кнопки внутри группы
     const buttons = group.getByRole('button');
     const btnCount = await buttons.count();
 
     if (btnCount === 0) continue;
 
-    // Выбираем случайную кнопку
     const randomIndex = Math.floor(Math.random() * btnCount);
     await buttons.nth(randomIndex).click();
   }
@@ -126,13 +122,12 @@ export async function fillObjectAddInfo(page) {
 }
 
 // --- Helpers ---
-// Randomly select an option from a combobox, skipping the first element
 export async function selectRandomOption(page, comboboxLocator) {
   await comboboxLocator.click();
   const options = page.getByRole('option');
   const count = await options.count();
 
-  // случайный индекс от 1 до count-1 (пропускаем первый)
+
   const randomIndex = Math.floor(Math.random() * (count - 1)) + 1;
   const optionLocator = options.nth(randomIndex);
   const randomOptionText = await optionLocator.textContent(); // ✅ get the text
@@ -140,14 +135,12 @@ export async function selectRandomOption(page, comboboxLocator) {
   return randomOptionText;
 }
 
-// Randomly fill a placeholder input from an array
+
 export async function fillRandomFromArray(page, placeholder, values) {
   const randomIndex = Math.floor(Math.random() * values.length);
   const value = values[randomIndex];
 
   await page.getByPlaceholder(placeholder).fill(value);
-
-  // Если это autocomplete, выбрать первый появившийся вариант
   await page.getByRole('option').first().click();
 
   return value;
