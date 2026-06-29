@@ -26,7 +26,7 @@ export default defineConfig({
   reporter: 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-     headless: true,        // обязательно для Render
+     headless: false,       
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },

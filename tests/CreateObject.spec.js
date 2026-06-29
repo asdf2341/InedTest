@@ -1,13 +1,14 @@
 import { test } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { fillLogin } from '../helpers/helpers.js';
+import { login } from '../utils/auth';
 import { sendMessage, sendPhoto } from '../telegramUtils.js';
-import { ObjectPage } from '../pages/ObjectCreationPage.js';
-import { AdditionalParamsPage } from '../pages/AdditionalParamsPage.js';
-import { ConditionsPage } from '../pages/ConditionsPage.js';
-import { UploadPage } from '../pages/UploadPhotoPage.js';
-import { DescriptionPage } from '../pages/DescriptionPage.js';
+import { ObjectPage } from '../pages/ObjectCreationPage';
+import { AdditionalParamsPage } from '../pages/AdditionalParamsPage';
+import { ConditionsPage } from '../pages/ConditionsPage';
+import { UploadPage } from '../pages/UploadPhotoPage';
+import { DescriptionPage } from '../pages/DescriptionPage';
+
 
 const successDir = path.resolve('successPhotos');
 const errorDir = path.resolve('errorPhotos');
@@ -42,76 +43,140 @@ test('Create object end-to-end', async ({ browser }) => {
   const conditionsPage = new ConditionsPage(page);
   const uploadPage = new UploadPage(page);
   const descriptionPage = new DescriptionPage(page);
-
+// const changeStatusPage = new ChangeStatusPage(page);
   const createdObjectInfo = {};
 
-  // --- скриншот только при ошибке, не сохраняем
-  async function takeErrorScreenshot(stepName) {
-    const buffer = await page.screenshot({ fullPage: true });
-    await sendPhoto(chatId, buffer, `❌ Скриншот ошибки: ${stepName}`);
-  }
+const startTime = Date.now();
 
-  try {
-    // --- Login ---
-    await page.goto('http://85.202.192.46:8081/login');
-    await fillLogin(page, 'ashamat@ined.kz', '12345678Test');
-    await sendMessage(chatId, '🔐 Логин выполнен');
+let report = `🚀 Test started\n\n`;
 
-    // --- Select object type ---
-    await page.getByText('Объекты').click();
-    await page.getByText('Новый объект').click();
-    createdObjectInfo.selectedValue = await objectPage.selectType();
-    await sendMessage(chatId, `✅ Тип объекта выбран: ${createdObjectInfo.selectedValue}`);
+function formatDuration(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
 
+  return `${minutes} мин ${seconds} сек`;
+}
 
-    // --- Address ---
-    const address = await objectPage.fillAddress();
-    Object.assign(createdObjectInfo, address);
-    await sendMessage(chatId, `✅ Адрес заполнен: ${address.streetName} ${address.RandomHouse}, кв ${address.randomFlat}`);
+await page.goto('http://85.202.192.46:8081/login');
+await login(page, 'ashamat@ined.kz', '12345678Test');
 
+report += '🔐 Login\n';
 
-    // --- Personal info ---
-    await objectPage.fillPersonalInfo();
-    await sendMessage(chatId, '✅ Контакты заполнены');
+try {
 
-    // --- Object details ---
-    await objectPage.fillObjectDetails();
-    await sendMessage(chatId, '✅ Основные параметры объекта заполнены');
+  await page.getByText('Объекты').click();
+  await page.getByText('Новый объект').click();
 
-    // --- Additional params ---
-    await additionalParamsPage.fillAdditionalParams();
-    await sendMessage(chatId, '✅ Дополнительные параметры заполнены');
+  // Address
+  const addr = await objectPage.fillAddress();
+  Object.assign(createdObjectInfo, addr);
+  report += '✅ Address\n';
 
-    // --- Conditions ---
-    await conditionsPage.fillConditions('InedInfo/Dogovor.pdf');
-    await sendMessage(chatId, '✅ Условия объекта заполнены');
+  // Personal info
+  await objectPage.fillPersonalInfo();
+  report += '✅ Personal info\n';
 
+  // Object details
+  await objectPage.fillObjectDetails();
+  report += '✅ Object details\n';
 
+  // Additional params
+  await additionalParamsPage.fillAdditionalParams();
+  report += '✅ Additional params\n';
 
-    // --- Upload photos ---
-    await uploadPage.uploadPhotos('InedInfo');
-    await sendMessage(chatId, '✅ Фото загружены');
+  // Conditions
+  await conditionsPage.fillConditions('InedInfo/Dogovor.pdf');
+  report += '✅ Conditions\n';
 
+  // Upload
+  await uploadPage.uploadPhotos('InedInfo');
+  report += '✅ Upload photos\n';
 
-    // --- Description ---
-    await descriptionPage.fillDescription(
-      'Это автотест сделал',
-      'Автотест проверяю функционал'
-    );
-    await sendMessage(chatId, '✅ Описание объекта заполнено');
+  // Description
+  await descriptionPage.fillDescription(
+    'Это автотест сделал',
+    'Автотест проверяю функционал'
+  );
+  report += '✅ Description\n';
 
-    // --- SUCCESS ---
-    await sendMessage(
-      chatId,
-      `🎉 <b>Тест успешно завершен!</b>\n🏠 Адрес: ${createdObjectInfo.selectedValue}, ${createdObjectInfo.streetName} ${createdObjectInfo.RandomHouse}, кв ${createdObjectInfo.randomFlat}`
-    );
+  const descriptionBlock = page.locator('div.description-step');
 
-  } catch (err) {
-    await takeErrorScreenshot(err.step || 'неизвестный шаг');
-    await sendMessage(chatId, `❌ <b>Тест упал!</b>\nОшибка: ${err.message}`);
-    throw err;
+  await descriptionBlock
+    .getByRole('button', { name: 'Сохранить' })
+    .waitFor({ state: 'detached' });
+  await page.waitForTimeout(1000);
+await page.waitForURL(url => {
+  const pathname = url.pathname;
 
-  } finally {
-    await context.close();
-  }
+  return /^\/objects\/\d+$/.test(pathname);
 });
+const objectUrl = page.url();
+const objectId = objectUrl.split('/').pop();
+
+report += `
+
+🆔 Object ID: ${objectId}
+🔗 ${objectUrl}
+`;
+
+  const screenshotPath = path.join(
+    successDir,
+    `success-${Date.now()}.png`
+  );
+
+  await page.screenshot({
+    path: screenshotPath,
+    fullPage: true,
+  });
+
+  report += `
+
+🎉 SUCCESS
+
+🏠 ${createdObjectInfo.selectedValue ?? ''}
+
+⏰ ${new Date().toLocaleTimeString('ru-RU')}
+
+⏱️ ${formatDuration(Date.now() - startTime)}
+`;
+
+  await sendPhoto(chatId, screenshotPath);
+  await sendMessage(chatId, report);
+
+} catch (err) {
+
+  const screenshotPath = path.join(
+    errorDir,
+    `error-${Date.now()}.png`
+  );
+
+  await page.screenshot({
+    path: screenshotPath,
+    fullPage: true,
+  });
+
+  report += `
+
+❌ FAILED
+
+⏰ ${new Date().toLocaleTimeString('ru-RU')}
+
+⏱️ ${formatDuration(Date.now() - startTime)}
+
+Ошибка:
+
+${String(err.message)}
+`;
+
+  await sendPhoto(chatId, screenshotPath);
+  await sendMessage(chatId, report);
+
+  throw err;
+
+} finally {
+
+  await page.close();
+  await context.close();
+
+}})
